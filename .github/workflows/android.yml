@@ -24,34 +24,26 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          candidates = [
-              Path("android/app/build.gradle.kts"),
-              Path("android/app/build.gradle"),
-          ]
-          changed = False
-          for path in candidates:
-              if not path.exists():
-                  continue
-              source = path.read_text()
-              if path.suffix == ".kts":
-                  updated, count = re.subn(
-                      r"(?m)^(\\s*)compileSdk(?:Version)?\\s*(?:=\\s*)?.*$",
-                      r"\\g<1>compileSdk = 36",
-                      source,
-                  )
-              else:
-                  updated, count = re.subn(
-                      r"(?m)^(\\s*)compileSdk(?:Version)?\\s*(?:=\\s*)?.*$",
-                      r"\\g<1>compileSdkVersion 36",
-                      source,
-                  )
-              if count:
-                  path.write_text(updated)
-                  print(f"Updated {path}: compile SDK set to 36")
-                  changed = True
-                  print("\\n".join(line for line in updated.splitlines() if "compileSdk" in line))
-          if not changed:
-              raise SystemExit("Could not find compileSdk declaration in generated Android app Gradle file")
+
+          path = Path("android/app/build.gradle.kts")
+          if not path.exists():
+              path = Path("android/app/build.gradle")
+          if not path.exists():
+              raise SystemExit("Android app Gradle file was not generated")
+
+          source = path.read_text()
+          pattern = r"(?m)^(\s*)compileSdk(?:Version)?\s*(?:=\s*)?.*$"
+          replacement = r"\g<1>compileSdk = 36" if path.suffix == ".kts" else r"\g<1>compileSdkVersion 36"
+          updated, count = re.subn(pattern, replacement, source)
+
+          if count == 0:
+              print("Generated Gradle file:")
+              print(source)
+              raise SystemExit("Could not find compileSdk declaration")
+          
+          path.write_text(updated)
+          print(f"Updated {path}; compile SDK is now 36")
+          print("\n".join(line for line in updated.splitlines() if "compileSdk" in line))
           PY
       - name: Add native PDF renderer
         run: |
