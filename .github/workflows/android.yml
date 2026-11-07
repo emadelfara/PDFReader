@@ -1,0 +1,32 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android project files
+        run: flutter create --platforms=android --project-name pdf_reader .
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Add native PDF renderer
+        run: |
+          mkdir -p android/app/src/main/kotlin/com/example/pdf_reader
+          cp tool/MainActivity.kt android/app/src/main/kotlin/com/example/pdf_reader/MainActivity.kt
+      - name: Build split APKs
+        run: flutter build apk --release --split-per-abi
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-reader-android-apks
+          path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
