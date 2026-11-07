@@ -52,7 +52,10 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
   int _pageIndex = 0;
   Uint8List? _pageImage;
   bool _loading = false;
+  bool _arabic = true;
   String? _error;
+
+  String _t(String ar, String en) => _arabic ? ar : en;
 
   Future<void> _pickPdf() async {
     try {
@@ -143,7 +146,7 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
         title: const Text('PDF Reader', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            tooltip: 'Open PDF',
+            tooltip: _t('فتح ملف PDF', 'Open PDF'),
             onPressed: _pickPdf,
             icon: const Icon(Icons.folder_open_rounded),
           ),
@@ -158,7 +161,7 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               color: const Color(0xFF191919),
               child: Text(
-                _fileName ?? 'PDF document',
+                _fileName ?? _t('ملف PDF', 'PDF document'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontWeight: FontWeight.w600),
@@ -182,11 +185,11 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
                             )
                           : _Message(
                               icon: Icons.picture_as_pdf_rounded,
-                              text: 'Open a PDF file to get started',
+                              text: _t('افتح ملف PDF للبدء', 'Open a PDF file to get started'),
                               action: FilledButton.icon(
                                 onPressed: _pickPdf,
                                 icon: const Icon(Icons.folder_open),
-                                label: const Text('Choose PDF'),
+                                label: Text(_t('اختيار ملف', 'Choose PDF')),
                               ),
                             ),
             ),
