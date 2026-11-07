@@ -143,8 +143,9 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
     final hasPdf = _filePath != null;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PDF Reader', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(_t('قارئ PDF', 'PDF Reader'), style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          TextButton(onPressed: () => setState(() => _arabic = !_arabic), child: Text(_arabic ? 'EN' : 'عربي')),
           IconButton(
             tooltip: _t('فتح ملف PDF', 'Open PDF'),
             onPressed: _pickPdf,
@@ -153,7 +154,9 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
           const SizedBox(width: 8),
         ],
       ),
-      body: Column(
+      body: Directionality(
+        textDirection: _arabic ? TextDirection.rtl : TextDirection.ltr,
+        child: Column(
         children: [
           if (hasPdf)
             Container(
@@ -222,7 +225,7 @@ class _ReaderHomePageState extends State<ReaderHomePage> {
               ),
             ),
         ],
-      ),
+      )),
     );
   }
 }
